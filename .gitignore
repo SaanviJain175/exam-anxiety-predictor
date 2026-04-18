@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.env
+*.zip
+StressLevelDataset.csv
+static/plots/*.png
