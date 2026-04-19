@@ -6,35 +6,27 @@
   <title>ExamMind — Anxiety Predictor</title>
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'Segoe UI',sans-serif;background:#0f0f1a;color:#e8e8f0;
-         min-height:100vh;display:flex;justify-content:center;
-         align-items:flex-start;padding:2rem}
-    .card{background:#1a1a2e;border-radius:16px;padding:2rem;
-          width:100%;max-width:750px;margin:auto}
-    h1{font-size:1.8rem;background:linear-gradient(135deg,#fff,#7c6aff);
-       -webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.3rem}
+    body{font-family:'Segoe UI',sans-serif;background:#0f0f1a;color:#e8e8f0;min-height:100vh;padding:2rem}
+    .container{max-width:800px;margin:auto}
+    h1{font-size:1.9rem;background:linear-gradient(135deg,#fff,#7c6aff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.3rem}
     .subtitle{color:#888;font-size:.85rem;margin-bottom:1.5rem}
-    .section-title{font-size:.7rem;font-weight:700;letter-spacing:.12em;
-                   text-transform:uppercase;color:#6affda;margin:1.2rem 0 .6rem}
+    .card{background:#1a1a2e;border-radius:16px;padding:1.8rem;margin-bottom:1.5rem}
+    .section-title{font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#6affda;margin:1.2rem 0 .8rem}
     .field{margin-bottom:1rem}
-    label{display:flex;justify-content:space-between;font-size:.85rem;
-          color:#aaa;margin-bottom:.35rem}
-    .val{background:#7c6aff22;color:#9d8aff;padding:.1rem .5rem;
-         border-radius:6px;font-weight:700}
+    label{display:flex;justify-content:space-between;font-size:.85rem;color:#aaa;margin-bottom:.35rem}
+    .val{background:#7c6aff22;color:#9d8aff;padding:.1rem .5rem;border-radius:6px;font-weight:700}
     input[type=range]{width:100%;accent-color:#7c6aff}
-    input[type=date]{width:100%;padding:.5rem;background:#ffffff0d;
-                     border:1px solid #ffffff15;border-radius:8px;
-                     color:#e8e8f0;font-size:.9rem}
+    input[type=date],input[type=text]{width:100%;padding:.5rem;background:#ffffff0d;border:1px solid #ffffff15;border-radius:8px;color:#e8e8f0;font-size:.9rem}
     .grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
     @media(max-width:520px){.grid2{grid-template-columns:1fr}}
-    .btn{width:100%;padding:.9rem;background:linear-gradient(135deg,#7c6aff,#ff6a9b);
-         border:none;border-radius:12px;color:#fff;font-size:1rem;
-         font-weight:700;cursor:pointer;margin-top:1rem;transition:.2s}
+    .btn{width:100%;padding:.9rem;background:linear-gradient(135deg,#7c6aff,#ff6a9b);border:none;border-radius:12px;color:#fff;font-size:1rem;font-weight:700;cursor:pointer;margin-top:1rem;transition:.2s}
     .btn:hover{opacity:.88;transform:translateY(-1px)}
-    .result{margin-top:1.5rem;background:#12121f;border-radius:12px;
-            padding:1.5rem;display:none}
-    .badge{display:inline-block;font-size:1.4rem;font-weight:800;
-           padding:.3rem 1.2rem;border-radius:10px;margin-bottom:1rem}
+    .btn-sm{padding:.5rem 1rem;border-radius:8px;border:none;cursor:pointer;font-size:.8rem;font-weight:600}
+    .btn-add{background:#6affda22;color:#6affda;border:1px solid #6affda44}
+    .btn-remove{background:#f8717122;color:#f87171;border:1px solid #f8717144}
+    .exam-row{display:flex;gap:.5rem;align-items:center;margin-bottom:.5rem;background:#ffffff05;padding:.6rem;border-radius:8px}
+    .exam-row input{flex:1;margin:0}
+    .badge{display:inline-block;font-size:1.3rem;font-weight:800;padding:.3rem 1.2rem;border-radius:10px;margin-bottom:1rem}
     .Low{background:#4ade8022;color:#4ade80;border:1px solid #4ade8044}
     .Medium{background:#facc1522;color:#facc15;border:1px solid #facc1544}
     .High{background:#f8717122;color:#f87171;border:1px solid #f8717144}
@@ -42,87 +34,149 @@
     .bar-lbl{width:54px;color:#888}
     .bar-track{flex:1;height:6px;background:#ffffff10;border-radius:999px;overflow:hidden}
     .bar-fill{height:100%;border-radius:999px;transition:width .8s}
-    .bar-fill.Low{background:#4ade80}
-    .bar-fill.Medium{background:#facc15}
-    .bar-fill.High{background:#f87171}
+    .bar-fill.Low{background:#4ade80}.bar-fill.Medium{background:#facc15}.bar-fill.High{background:#f87171}
     .bar-pct{width:36px;text-align:right}
-    .escalation-box{margin-top:1rem;padding:.8rem 1rem;border-radius:8px;
-                    font-size:.85rem;line-height:1.5}
-    .escalation-box.escalated{background:#f8717115;border:1px solid #f8717144;color:#f87171}
-    .escalation-box.normal{background:#4ade8015;border:1px solid #4ade8044;color:#4ade80}
-    .coping-title{font-size:.75rem;font-weight:700;letter-spacing:.1em;
-                  text-transform:uppercase;color:#6affda;margin-top:1rem;margin-bottom:.6rem}
+    .exam-alert{padding:.8rem 1rem;border-radius:8px;font-size:.85rem;margin:.4rem 0;line-height:1.5}
+    .alert-critical{background:#f8717115;border:1px solid #f8717166;color:#f87171}
+    .alert-warning{background:#facc1515;border:1px solid #facc1566;color:#facc15}
+    .alert-ok{background:#4ade8015;border:1px solid #4ade8066;color:#4ade80}
+    .alert-info{background:#7c6aff15;border:1px solid #7c6aff44;color:#9d8aff}
+    .coping-title{font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#6affda;margin:1rem 0 .5rem}
     .coping-text{white-space:pre-line;line-height:1.7;font-size:.9rem}
-    .loader{display:none;text-align:center;padding:1rem;color:#7c6aff}
+    .plan-day{background:#ffffff05;border-radius:10px;padding:1rem;margin-bottom:.8rem}
+    .plan-day-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem}
+    .plan-day-title{font-weight:700;color:#9d8aff}
+    .plan-note{font-size:.75rem;color:#888}
+    .session-block{display:flex;align-items:center;gap:.8rem;padding:.4rem .6rem;background:#7c6aff15;border-radius:6px;margin:.3rem 0;font-size:.82rem}
+    .session-time{color:#6affda;font-weight:700;min-width:45px}
+    .session-sub{flex:1;color:#e8e8f0}
+    .session-dur{color:#888}
+    .tab-row{display:flex;gap:.5rem;margin-bottom:1rem;flex-wrap:wrap}
+    .tab{padding:.5rem 1.2rem;border-radius:8px;cursor:pointer;font-size:.85rem;font-weight:600;border:1px solid #ffffff15;background:transparent;color:#888;transition:.2s}
+    .tab.active{background:#7c6aff;color:#fff;border-color:#7c6aff}
+    .tab-content{display:none}.tab-content.active{display:block}
+    .tracking-entry{display:flex;justify-content:space-between;align-items:center;padding:.6rem 1rem;background:#ffffff05;border-radius:8px;margin:.3rem 0;font-size:.82rem}
+    .pattern-alert{padding:.7rem 1rem;border-radius:8px;font-size:.85rem;margin:.4rem 0}
+    .loader{display:none;text-align:center;padding:1rem;color:#7c6aff;font-size:.9rem}
+    .hidden{display:none}
+    .escalation-banner{padding:1rem;border-radius:10px;margin-bottom:1rem;font-weight:700;font-size:1rem;text-align:center}
   </style>
 </head>
 <body>
-<div class="card">
-  <h1>🎓 Exam Anxiety Predictor</h1>
-  <p class="subtitle">AI Powered · Random Forest · LLaMA 3.1 · Timetable-Aware Risk</p>
+<div class="container">
+  <div class="card">
+    <h1>🎓 ExamMind — Anxiety Predictor</h1>
+    <p class="subtitle">AI Powered · Random Forest · LLaMA 3.1 · Timetable-Aware Risk Escalation · Study Plan Generator · Longitudinal Tracking</p>
 
-  <div class="section-title">Student Profile</div>
-  <div class="grid2">
-    <div class="field">
-      <label>Sleep Quality <span class="val" id="v-sleep">3</span></label>
-      <input type="range" id="sleep_quality" min="1" max="5" value="3"
-             oninput="document.getElementById('v-sleep').textContent=this.value"/>
+    <!-- Student Profile -->
+    <div class="section-title">Student Profile</div>
+    <div class="grid2">
+      <div class="field"><label>Sleep Quality <span class="val" id="v-sleep">3</span></label>
+        <input type="range" id="sleep_quality" min="1" max="5" value="3" oninput="document.getElementById('v-sleep').textContent=this.value"/></div>
+      <div class="field"><label>Headache Frequency <span class="val" id="v-head">2</span></label>
+        <input type="range" id="headache" min="1" max="5" value="2" oninput="document.getElementById('v-head').textContent=this.value"/></div>
+      <div class="field"><label>Academic Performance <span class="val" id="v-acad">3</span></label>
+        <input type="range" id="academic_performance" min="1" max="5" value="3" oninput="document.getElementById('v-acad').textContent=this.value"/></div>
+      <div class="field"><label>Study Load <span class="val" id="v-load">3</span></label>
+        <input type="range" id="study_load" min="1" max="5" value="3" oninput="document.getElementById('v-load').textContent=this.value"/></div>
+      <div class="field"><label>Extracurricular Activities <span class="val" id="v-extra">2</span></label>
+        <input type="range" id="extracurricular_activities" min="0" max="5" value="2" oninput="document.getElementById('v-extra').textContent=this.value"/></div>
+      <div class="field"><label>Peer Pressure <span class="val" id="v-peer">2</span></label>
+        <input type="range" id="peer_pressure" min="1" max="5" value="2" oninput="document.getElementById('v-peer').textContent=this.value"/></div>
+      <div class="field" style="grid-column:1/-1"><label>Future Career Concerns <span class="val" id="v-career">3</span></label>
+        <input type="range" id="future_career_concerns" min="1" max="5" value="3" oninput="document.getElementById('v-career').textContent=this.value"/></div>
     </div>
-    <div class="field">
-      <label>Headache Frequency <span class="val" id="v-head">2</span></label>
-      <input type="range" id="headache" min="1" max="5" value="2"
-             oninput="document.getElementById('v-head').textContent=this.value"/>
-    </div>
-    <div class="field">
-      <label>Academic Performance <span class="val" id="v-acad">3</span></label>
-      <input type="range" id="academic_performance" min="1" max="5" value="3"
-             oninput="document.getElementById('v-acad').textContent=this.value"/>
-    </div>
-    <div class="field">
-      <label>Study Load <span class="val" id="v-load">3</span></label>
-      <input type="range" id="study_load" min="1" max="5" value="3"
-             oninput="document.getElementById('v-load').textContent=this.value"/>
-    </div>
-    <div class="field">
-      <label>Extracurricular Activities <span class="val" id="v-extra">2</span></label>
-      <input type="range" id="extracurricular_activities" min="0" max="5" value="2"
-             oninput="document.getElementById('v-extra').textContent=this.value"/>
-    </div>
-    <div class="field">
-      <label>Peer Pressure <span class="val" id="v-peer">2</span></label>
-      <input type="range" id="peer_pressure" min="1" max="5" value="2"
-             oninput="document.getElementById('v-peer').textContent=this.value"/>
-    </div>
-    <div class="field">
-      <label>Future Career Concerns <span class="val" id="v-career">3</span></label>
-      <input type="range" id="future_career_concerns" min="1" max="5" value="3"
-             oninput="document.getElementById('v-career').textContent=this.value"/>
-    </div>
-    <div class="field">
-      <label>Exam Date <span style="color:#6affda;font-size:.75rem">(optional)</span></label>
-      <input type="date" id="exam_date"/>
-    </div>
+
+    <!-- Exam Schedule -->
+    <div class="section-title">📅 Exam Schedule (Timetable Input)</div>
+    <p style="font-size:.8rem;color:#888;margin-bottom:.8rem">Add your upcoming exams. The model will automatically escalate risk based on proximity to exam dates.</p>
+    <div id="exam-list"></div>
+    <button class="btn-sm btn-add" onclick="addExam()">+ Add Exam</button>
+
+    <button class="btn" onclick="predict()">⚡ Predict My Anxiety Level</button>
+    <div class="loader" id="loader">⏳ Analysing with AI...</div>
   </div>
 
-  <button class="btn" onclick="predict()">⚡ Predict My Anxiety Level</button>
-  <div class="loader" id="loader">⏳ Analysing with AI...</div>
+  <!-- Results -->
+  <div class="card hidden" id="result-card">
+    <div class="section-title">Results</div>
 
-  <div class="result" id="result">
+    <!-- Escalation Banner -->
+    <div id="escalation-banner"></div>
+
     <div class="badge" id="badge"></div>
     <div id="bars"></div>
-    <div id="escalation-container"></div>
-    <div class="coping-title">✦ AI Wellness Recommendations</div>
-    <div class="coping-text" id="coping"></div>
+
+    <!-- Tabs -->
+    <div class="tab-row" style="margin-top:1.2rem">
+      <button class="tab active" onclick="switchTab('tab-risk')">📅 Timetable Risk</button>
+      <button class="tab" onclick="switchTab('tab-plan')">📚 Study Plan</button>
+      <button class="tab" onclick="switchTab('tab-coping')">💡 Coping Strategy</button>
+      <button class="tab" onclick="switchTab('tab-tracking')">📈 Tracking</button>
+    </div>
+
+    <!-- Tab 1: Timetable Risk -->
+    <div class="tab-content active" id="tab-risk">
+      <div id="timetable-results"></div>
+    </div>
+
+    <!-- Tab 2: Study Plan -->
+    <div class="tab-content" id="tab-plan">
+      <div id="study-plan-results"></div>
+    </div>
+
+    <!-- Tab 3: Coping -->
+    <div class="tab-content" id="tab-coping">
+      <div class="coping-title">✦ AI Wellness Recommendations</div>
+      <div class="coping-text" id="coping"></div>
+    </div>
+
+    <!-- Tab 4: Longitudinal Tracking -->
+    <div class="tab-content" id="tab-tracking">
+      <div id="tracking-results"></div>
+    </div>
   </div>
 </div>
 
 <script>
+// ── Exam rows ──────────────────────────────────────────────────────────────
+function addExam() {
+  const list = document.getElementById("exam-list");
+  const row  = document.createElement("div");
+  row.className = "exam-row";
+  row.innerHTML = `
+    <input type="text"  placeholder="Subject (e.g. Mathematics)" class="exam-subject"/>
+    <input type="date"  class="exam-date"/>
+    <button class="btn-sm btn-remove" onclick="this.parentElement.remove()">✕</button>`;
+  list.appendChild(row);
+}
+
+function getExamSchedule() {
+  const rows = document.querySelectorAll(".exam-row");
+  const exams = [];
+  rows.forEach(row => {
+    const subject = row.querySelector(".exam-subject").value.trim();
+    const date    = row.querySelector(".exam-date").value;
+    if (subject && date) exams.push({ subject, date });
+  });
+  return exams;
+}
+
+// ── Tabs ───────────────────────────────────────────────────────────────────
+function switchTab(id) {
+  document.querySelectorAll(".tab-content").forEach(t => t.classList.remove("active"));
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  event.target.classList.add("active");
+}
+
+// ── Main predict ───────────────────────────────────────────────────────────
 async function predict() {
   const btn    = document.querySelector('.btn');
   const loader = document.getElementById('loader');
   btn.disabled = true;
   loader.style.display = 'block';
-  document.getElementById('result').style.display = 'none';
+  document.getElementById("result-card").classList.add("hidden");
 
   const payload = {
     sleep_quality:              +document.getElementById("sleep_quality").value,
@@ -132,7 +186,7 @@ async function predict() {
     extracurricular_activities: +document.getElementById("extracurricular_activities").value,
     peer_pressure:              +document.getElementById("peer_pressure").value,
     future_career_concerns:     +document.getElementById("future_career_concerns").value,
-    exam_date:                   document.getElementById("exam_date").value
+    exam_schedule:              getExamSchedule()
   };
 
   try {
@@ -143,43 +197,178 @@ async function predict() {
     });
     const d = await r.json();
     if (d.status !== "success") { alert("Error: " + d.message); return; }
-
-    const badge = document.getElementById("badge");
-    badge.textContent = d.anxiety_level + " Anxiety";
-    badge.className   = "badge " + d.anxiety_level;
-
-    const order = ["Low","Medium","High"];
-    document.getElementById("bars").innerHTML = order.map(cls => {
-      const p = (d.probabilities[cls] || 0) * 100;
-      return `<div class="bar-row">
-        <span class="bar-lbl">${cls}</span>
-        <div class="bar-track">
-          <div class="bar-fill ${cls}" style="width:${p.toFixed(1)}%"></div>
-        </div>
-        <span class="bar-pct">${p.toFixed(0)}%</span>
-      </div>`;
-    }).join("");
-
-    const esc    = d.risk_escalation || {};
-    const escBox = document.getElementById("escalation-container");
-    if (esc && esc.days_to_exam !== null && esc.days_to_exam !== undefined) {
-      const cls = esc.escalated ? "escalated" : "normal";
-      escBox.innerHTML = `<div class="escalation-box ${cls}">
-        📅 <strong>Timetable Risk:</strong> ${esc.reason}
-        ${esc.escalated ? ` → Adjusted: <strong>${esc.adjusted_label}</strong>` : ""}
-      </div>`;
-    } else {
-      escBox.innerHTML = "";
-    }
-
-    document.getElementById("coping").textContent = d.coping_strategy;
-    document.getElementById("result").style.display = "block";
+    renderResults(d);
   } catch(e) {
     alert("Network error: " + e.message);
   } finally {
     btn.disabled = false;
-    loader.style.display = 'none';
+    loader.style.display = "none";
   }
+}
+
+function renderResults(d) {
+  // Badge
+  const badge = document.getElementById("badge");
+  badge.textContent = d.final_label + " Anxiety";
+  badge.className   = "badge " + d.final_label;
+
+  // Escalation banner
+  const banner = document.getElementById("escalation-banner");
+  if (d.timetable_risk && d.timetable_risk.overall_escalated) {
+    banner.innerHTML = `<div class="escalation-banner High">
+      🚨 Risk Escalated: ${d.anxiety_level} → ${d.final_label} due to upcoming exam proximity
+    </div>`;
+  } else {
+    banner.innerHTML = "";
+  }
+
+  // Probability bars
+  const order = ["Low","Medium","High"];
+  document.getElementById("bars").innerHTML = order.map(cls => {
+    const p = (d.probabilities[cls] || 0) * 100;
+    return `<div class="bar-row">
+      <span class="bar-lbl">${cls}</span>
+      <div class="bar-track"><div class="bar-fill ${cls}" style="width:${p.toFixed(1)}%"></div></div>
+      <span class="bar-pct">${p.toFixed(0)}%</span>
+    </div>`;
+  }).join("");
+
+  // Tab 1: Timetable
+  renderTimetable(d.timetable_risk);
+
+  // Tab 2: Study Plan
+  renderStudyPlan(d.study_plan);
+
+  // Tab 3: Coping
+  document.getElementById("coping").textContent = d.coping_strategy;
+
+  // Tab 4: Tracking
+  renderTracking(d.patterns);
+
+  document.getElementById("result-card").classList.remove("hidden");
+  document.getElementById("result-card").scrollIntoView({behavior:"smooth"});
+}
+
+function renderTimetable(risk) {
+  const el = document.getElementById("timetable-results");
+  if (!risk || !risk.exam_results || risk.exam_results.length === 0) {
+    el.innerHTML = `<div class="exam-alert alert-info">
+      ℹ️ No exam schedule entered. Add your exam dates above to enable timetable-aware risk escalation.
+    </div>`;
+    return;
+  }
+
+  let html = "";
+  risk.exam_results.forEach(r => {
+    const cls = r.escalated ? "alert-critical" :
+                r.days_left <= 5 ? "alert-warning" :
+                r.days_left <= 7 ? "alert-info" : "alert-ok";
+    html += `<div class="exam-alert ${cls}">
+      <strong>${r.subject}</strong> — ${r.date}
+      ${r.days_left >= 0 ? `(${r.days_left} days away)` : "(past)"}
+      <br/><span style="font-size:.82rem">${r.message}</span>
+    </div>`;
+  });
+
+  if (risk.overall_escalated) {
+    html = `<div class="exam-alert alert-critical" style="margin-bottom:.8rem">
+      🚨 <strong>Overall Risk Escalated:</strong> ${risk.base_label} → ${risk.final_label}
+    </div>` + html;
+  }
+
+  el.innerHTML = html;
+}
+
+function renderStudyPlan(plan) {
+  const el = document.getElementById("study-plan-results");
+  if (!plan) {
+    el.innerHTML = `<div class="exam-alert alert-info">Add exam dates above to generate your personalised day-by-day study plan.</div>`;
+    return;
+  }
+  if (plan.error) {
+    el.innerHTML = `<div class="exam-alert alert-info">${plan.error}</div>`;
+    return;
+  }
+
+  let html = `<div class="exam-alert alert-info" style="margin-bottom:1rem">
+    💡 ${plan.tip}<br/>
+    <strong>Sessions:</strong> ${plan.session_mins} min focus · ${plan.break_mins} min break · ~${plan.daily_hours} hrs/day
+  </div>`;
+
+  plan.plan.forEach(p => {
+    html += `<div style="margin-bottom:1.5rem">
+      <div style="font-weight:700;color:#9d8aff;margin-bottom:.6rem;font-size:.95rem">
+        📚 ${p.exam_subject} — Exam on ${p.exam_date} (${p.days_left} days away)
+      </div>`;
+
+    p.schedule.forEach(day => {
+      html += `<div class="plan-day">
+        <div class="plan-day-header">
+          <span class="plan-day-title">Day ${day.day} — ${day.weekday}, ${day.date}</span>
+          <span class="plan-note">${day.note}</span>
+        </div>`;
+
+      day.sessions.forEach(s => {
+        html += `<div class="session-block">
+          <span class="session-time">${s.time}</span>
+          <span class="session-sub">${s.subject}</span>
+          <span class="session-dur">${s.duration}</span>
+        </div>`;
+      });
+
+      html += `</div>`;
+    });
+
+    html += `</div>`;
+  });
+
+  el.innerHTML = html;
+}
+
+function renderTracking(patterns) {
+  const el = document.getElementById("tracking-results");
+  if (!patterns) { el.innerHTML = ""; return; }
+
+  if (patterns.message) {
+    el.innerHTML = `<div class="exam-alert alert-info">${patterns.message}</div>`;
+    return;
+  }
+
+  let html = `<div style="margin-bottom:1rem">
+    <strong style="color:#6affda">Pattern Analysis</strong>
+    <span style="color:#888;font-size:.82rem;margin-left:.5rem">(Last ${patterns.recent_entries?.length || 0} sessions)</span>
+  </div>`;
+
+  // Alerts
+  (patterns.alerts || []).forEach(a => {
+    const cls = a.startsWith("🚨") ? "alert-critical" : a.startsWith("😴") || a.startsWith("📚") ? "alert-warning" : "alert-ok";
+    html += `<div class="pattern-alert exam-alert ${cls}">${a}</div>`;
+  });
+
+  // Stats
+  html += `<div class="grid2" style="margin:1rem 0;gap:.5rem">
+    <div style="background:#ffffff05;padding:.8rem;border-radius:8px;text-align:center">
+      <div style="font-size:1.4rem;font-weight:800;color:#9d8aff">${patterns.high_count}</div>
+      <div style="font-size:.75rem;color:#888">High Risk Sessions (last 7)</div>
+    </div>
+    <div style="background:#ffffff05;padding:.8rem;border-radius:8px;text-align:center">
+      <div style="font-size:1.4rem;font-weight:800;color:#6affda">${patterns.avg_sleep}/5</div>
+      <div style="font-size:.75rem;color:#888">Avg Sleep Quality</div>
+    </div>
+  </div>`;
+
+  // History table
+  html += `<div style="font-size:.75rem;font-weight:700;color:#6affda;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.5rem">Session History</div>`;
+  (patterns.entries || []).slice().reverse().slice(0,10).forEach(e => {
+    const cls = e.escalated_label === "High" ? "alert-critical" : e.escalated_label === "Medium" ? "alert-warning" : "alert-ok";
+    html += `<div class="tracking-entry">
+      <span style="color:#888">${e.date} ${e.time}</span>
+      <span>Sleep: ${e.sleep_quality}/5 · Load: ${e.study_load}/5</span>
+      <span class="badge ${e.escalated_label}" style="font-size:.75rem;padding:.15rem .6rem;margin:0">${e.escalated_label}</span>
+    </div>`;
+  });
+
+  el.innerHTML = html;
 }
 </script>
 </body>
