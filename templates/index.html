@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ExamMind — Anxiety Predictor</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',sans-serif;background:#0f0f1a;color:#e8e8f0;
+         min-height:100vh;display:flex;justify-content:center;
+         align-items:flex-start;padding:2rem}
+    .card{background:#1a1a2e;border-radius:16px;padding:2rem;
+          width:100%;max-width:750px;margin:auto}
+    h1{font-size:1.8rem;background:linear-gradient(135deg,#fff,#7c6aff);
+       -webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.3rem}
+    .subtitle{color:#888;font-size:.85rem;margin-bottom:1.5rem}
+    .section-title{font-size:.7rem;font-weight:700;letter-spacing:.12em;
+                   text-transform:uppercase;color:#6affda;margin:1.2rem 0 .6rem}
+    .field{margin-bottom:1rem}
+    label{display:flex;justify-content:space-between;font-size:.85rem;
+          color:#aaa;margin-bottom:.35rem}
+    .val{background:#7c6aff22;color:#9d8aff;padding:.1rem .5rem;
+         border-radius:6px;font-weight:700}
+    input[type=range]{width:100%;accent-color:#7c6aff}
+    input[type=date]{width:100%;padding:.5rem;background:#ffffff0d;
+                     border:1px solid #ffffff15;border-radius:8px;
+                     color:#e8e8f0;font-size:.9rem}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+    @media(max-width:520px){.grid2{grid-template-columns:1fr}}
+    .btn{width:100%;padding:.9rem;background:linear-gradient(135deg,#7c6aff,#ff6a9b);
+         border:none;border-radius:12px;color:#fff;font-size:1rem;
+         font-weight:700;cursor:pointer;margin-top:1rem;transition:.2s}
+    .btn:hover{opacity:.88;transform:translateY(-1px)}
+    .result{margin-top:1.5rem;background:#12121f;border-radius:12px;
+            padding:1.5rem;display:none}
+    .badge{display:inline-block;font-size:1.4rem;font-weight:800;
+           padding:.3rem 1.2rem;border-radius:10px;margin-bottom:1rem}
+    .Low{background:#4ade8022;color:#4ade80;border:1px solid #4ade8044}
+    .Medium{background:#facc1522;color:#facc15;border:1px solid #facc1544}
+    .High{background:#f8717122;color:#f87171;border:1px solid #f8717144}
+    .bar-row{display:flex;align-items:center;gap:.6rem;margin:.3rem 0;font-size:.8rem}
+    .bar-lbl{width:54px;color:#888}
+    .bar-track{flex:1;height:6px;background:#ffffff10;border-radius:999px;overflow:hidden}
+    .bar-fill{height:100%;border-radius:999px;transition:width .8s}
+    .bar-fill.Low{background:#4ade80}
+    .bar-fill.Medium{background:#facc15}
+    .bar-fill.High{background:#f87171}
+    .bar-pct{width:36px;text-align:right}
+    .escalation-box{margin-top:1rem;padding:.8rem 1rem;border-radius:8px;
+                    font-size:.85rem;line-height:1.5}
+    .escalation-box.escalated{background:#f8717115;border:1px solid #f8717144;color:#f87171}
+    .escalation-box.normal{background:#4ade8015;border:1px solid #4ade8044;color:#4ade80}
+    .coping-title{font-size:.75rem;font-weight:700;letter-spacing:.1em;
+                  text-transform:uppercase;color:#6affda;margin-top:1rem;margin-bottom:.6rem}
+    .coping-text{white-space:pre-line;line-height:1.7;font-size:.9rem}
+    .loader{display:none;text-align:center;padding:1rem;color:#7c6aff}
+  </style>
+</head>
+<body>
+<div class="card">
+  <h1>🎓 Exam Anxiety Predictor</h1>
+  <p class="subtitle">AI Powered · Random Forest · LLaMA 3.1 · Timetable-Aware Risk</p>
+
+  <div class="section-title">Student Profile</div>
+  <div class="grid2">
+    <div class="field">
+      <label>Sleep Quality <span class="val" id="v-sleep">3</span></label>
+      <input type="range" id="sleep_quality" min="1" max="5" value="3"
+             oninput="document.getElementById('v-sleep').textContent=this.value"/>
+    </div>
+    <div class="field">
+      <label>Headache Frequency <span class="val" id="v-head">2</span></label>
+      <input type="range" id="headache" min="1" max="5" value="2"
+             oninput="document.getElementById('v-head').textContent=this.value"/>
+    </div>
+    <div class="field">
+      <label>Academic Performance <span class="val" id="v-acad">3</span></label>
+      <input type="range" id="academic_performance" min="1" max="5" value="3"
+             oninput="document.getElementById('v-acad').textContent=this.value"/>
+    </div>
+    <div class="field">
+      <label>Study Load <span class="val" id="v-load">3</span></label>
+      <input type="range" id="study_load" min="1" max="5" value="3"
+             oninput="document.getElementById('v-load').textContent=this.value"/>
+    </div>
+    <div class="field">
+      <label>Extracurricular Activities <span class="val" id="v-extra">2</span></label>
+      <input type="range" id="extracurricular_activities" min="0" max="5" value="2"
+             oninput="document.getElementById('v-extra').textContent=this.value"/>
+    </div>
+    <div class="field">
+      <label>Peer Pressure <span class="val" id="v-peer">2</span></label>
+      <input type="range" id="peer_pressure" min="1" max="5" value="2"
+             oninput="document.getElementById('v-peer').textContent=this.value"/>
+    </div>
+    <div class="field">
+      <label>Future Career Concerns <span class="val" id="v-career">3</span></label>
+      <input type="range" id="future_career_concerns" min="1" max="5" value="3"
+             oninput="document.getElementById('v-career').textContent=this.value"/>
+    </div>
+    <div class="field">
+      <label>Exam Date <span style="color:#6affda;font-size:.75rem">(optional)</span></label>
+      <input type="date" id="exam_date"/>
+    </div>
+  </div>
+
+  <button class="btn" onclick="predict()">⚡ Predict My Anxiety Level</button>
+  <div class="loader" id="loader">⏳ Analysing with AI...</div>
+
+  <div class="result" id="result">
+    <div class="badge" id="badge"></div>
+    <div id="bars"></div>
+    <div id="escalation-container"></div>
+    <div class="coping-title">✦ AI Wellness Recommendations</div>
+    <div class="coping-text" id="coping"></div>
+  </div>
+</div>
+
+<script>
+async function predict() {
+  const btn    = document.querySelector('.btn');
+  const loader = document.getElementById('loader');
+  btn.disabled = true;
+  loader.style.display = 'block';
+  document.getElementById('result').style.display = 'none';
+
+  const payload = {
+    sleep_quality:              +document.getElementById("sleep_quality").value,
+    headache:                   +document.getElementById("headache").value,
+    academic_performance:       +document.getElementById("academic_performance").value,
+    study_load:                 +document.getElementById("study_load").value,
+    extracurricular_activities: +document.getElementById("extracurricular_activities").value,
+    peer_pressure:              +document.getElementById("peer_pressure").value,
+    future_career_concerns:     +document.getElementById("future_career_concerns").value,
+    exam_date:                   document.getElementById("exam_date").value
+  };
+
+  try {
+    const r = await fetch("/predict", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(payload)
+    });
+    const d = await r.json();
+    if (d.status !== "success") { alert("Error: " + d.message); return; }
+
+    const badge = document.getElementById("badge");
+    badge.textContent = d.anxiety_level + " Anxiety";
+    badge.className   = "badge " + d.anxiety_level;
+
+    const order = ["Low","Medium","High"];
+    document.getElementById("bars").innerHTML = order.map(cls => {
+      const p = (d.probabilities[cls] || 0) * 100;
+      return `<div class="bar-row">
+        <span class="bar-lbl">${cls}</span>
+        <div class="bar-track">
+          <div class="bar-fill ${cls}" style="width:${p.toFixed(1)}%"></div>
+        </div>
+        <span class="bar-pct">${p.toFixed(0)}%</span>
+      </div>`;
+    }).join("");
+
+    const esc    = d.risk_escalation || {};
+    const escBox = document.getElementById("escalation-container");
+    if (esc && esc.days_to_exam !== null && esc.days_to_exam !== undefined) {
+      const cls = esc.escalated ? "escalated" : "normal";
+      escBox.innerHTML = `<div class="escalation-box ${cls}">
+        📅 <strong>Timetable Risk:</strong> ${esc.reason}
+        ${esc.escalated ? ` → Adjusted: <strong>${esc.adjusted_label}</strong>` : ""}
+      </div>`;
+    } else {
+      escBox.innerHTML = "";
+    }
+
+    document.getElementById("coping").textContent = d.coping_strategy;
+    document.getElementById("result").style.display = "block";
+  } catch(e) {
+    alert("Network error: " + e.message);
+  } finally {
+    btn.disabled = false;
+    loader.style.display = 'none';
+  }
+}
+</script>
+</body>
+</html>
